@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 // POST /api/admin/sync-workspace
 // Called by admin UI with the admin user's Google OAuth access token.
 // Fetches the Google Workspace Directory and upserts all users into Firestore.
