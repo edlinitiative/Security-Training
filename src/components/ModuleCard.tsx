@@ -23,6 +23,12 @@ interface ModuleCardProps {
   progress?: number;
 }
 
+function formatDueDate(iso: string): string {
+  const d = new Date(iso + "T00:00:00");
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 export default function ModuleCard({
   module,
   status = "not_started",
@@ -108,9 +114,20 @@ export default function ModuleCard({
 
         {/* Dashed divider + footer */}
         <div style={{ marginTop: "16px", paddingTop: "14px", borderTop: "1px dashed #cbd5e1", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "11.5px", color: "#64748b", fontWeight: 600 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>schedule</span>
-            {module.estimatedMinutes} min
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", fontSize: "11.5px", color: "#64748b", fontWeight: 600, flexWrap: "wrap" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+              <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>schedule</span>
+              {module.estimatedMinutes} min
+            </span>
+            {module.dueDate && (
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: "5px", color: status === "completed" ? "#64748b" : "#b45309" }}
+                title={`Due ${formatDueDate(module.dueDate)}`}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>event</span>
+                Due {formatDueDate(module.dueDate)}
+              </span>
+            )}
           </div>
           <span className="dash-mod-cta" style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: 700, color: status === "completed" ? blueDeep : "#475569", transition: "all 0.2s", letterSpacing: "-0.005em" }}>
             {ctaText}

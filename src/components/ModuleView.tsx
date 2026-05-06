@@ -16,6 +16,7 @@ import {
   Award,
   RotateCcw,
   Flag,
+  Calendar,
 } from "lucide-react";
 import { TrainingModule } from "@/types";
 import QuizSection from "@/components/QuizSection";
@@ -288,7 +289,7 @@ export default function ModuleView({ module }: ModuleViewProps) {
         {/* Lower strip */}
         <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-sm text-white/80 leading-relaxed max-w-xl">{module.description}</p>
-          <div className="flex items-center gap-4 text-sm text-white/70 flex-shrink-0">
+          <div className="flex items-center gap-4 text-sm text-white/70 flex-shrink-0 flex-wrap">
             <div className="flex items-center gap-1.5">
               <Clock className="h-4 w-4" />
               <span>~{module.estimatedMinutes} min</span>
@@ -297,6 +298,19 @@ export default function ModuleView({ module }: ModuleViewProps) {
               <HelpCircle className="h-4 w-4" />
               <span>{Math.min(5, module.questions.length)} questions</span>
             </div>
+            {module.dueDate && (
+              <div className="flex items-center gap-1.5 text-amber-200">
+                <Calendar className="h-4 w-4" />
+                <span>
+                  Due{" "}
+                  {new Date(module.dueDate + "T00:00:00").toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

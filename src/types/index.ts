@@ -36,6 +36,7 @@ export interface TrainingModule {
   description: string;
   order: number;
   estimatedMinutes: number;
+  dueDate: string;
   isActive: boolean;
   icon: string;
   color: string;
