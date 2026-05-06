@@ -25,6 +25,20 @@ export default function ModulesPage() {
     return getModuleProgress(prev.id).status !== "completed";
   }
 
+  function isNotYetAvailable(availableDate: string) {
+    if (isAdmin) return false;
+    const now = new Date();
+    const avail = new Date(availableDate + "T00:00:00");
+    return now < avail;
+  }
+
+  function formatAvailableDate(iso: string) {
+    return new Date(iso + "T00:00:00").toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+    });
+  }
+
   return (
     <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-10 max-w-6xl mx-auto">
       {/* Header */}
@@ -62,14 +76,15 @@ export default function ModulesPage() {
       <div className="flex items-center gap-2.5 bg-teal-50 border border-teal-100 rounded-xl px-4 py-3 mb-8">
         <div className="h-1.5 w-1.5 rounded-full bg-teal-500 flex-shrink-0" />
         <p className="text-sm text-teal-700">
-          <strong>Modules are sequential.</strong> You must complete each module before unlocking the next one.
+          <strong>Modules unlock monthly.</strong> Each module becomes available on the 1st of its assigned month and is due on the 15th. You must also complete each module before unlocking the next one.
         </p>
       </div>
 
       {/* Module grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {modules.map((mod) => {
-          const locked = !loading && isLocked(mod.order);
+          const notAvailable = isNotYetAvailable(mod.availableDate);
+          const locked = !loading && (notAvailable || isLocked(mod.order));
           const prog = getModuleProgress(mod.id);
           return (
             <div key={mod.id} className="relative">
@@ -83,8 +98,10 @@ export default function ModulesPage() {
                   <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
                     <Lock className="h-5 w-5 text-slate-400" />
                   </div>
-                  <p className="text-xs font-semibold text-slate-500">
-                    Complete Module {mod.order - 1} first
+                  <p className="text-xs font-semibold text-slate-500 text-center px-3">
+                    {notAvailable
+                      ? `Available ${formatAvailableDate(mod.availableDate)}`
+                      : `Complete Module ${mod.order - 1} first`}
                   </p>
                 </div>
               )}

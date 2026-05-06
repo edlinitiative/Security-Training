@@ -115,11 +115,14 @@ export default function ModuleView({ module }: ModuleViewProps) {
 
   // Find the previous module (by order)
   const previousModule = modules.find((m) => m.order === module.order - 1);
-  const isLocked =
+  const isLockedBySequence =
     !isAdmin &&
     !progressLoading &&
     previousModule !== undefined &&
     getModuleProgress(previousModule.id).status !== "completed";
+  const availableAt = new Date(module.availableDate + "T00:00:00");
+  const isLockedByDate = !isAdmin && new Date() < availableAt;
+  const isLocked = isLockedBySequence || isLockedByDate;
 
   const moduleProgress = getModuleProgress(module.id);
   const alreadyCompleted =
@@ -185,19 +188,42 @@ export default function ModuleView({ module }: ModuleViewProps) {
             <Lock className="h-7 w-7 text-slate-400" />
           </div>
           <h2 className="text-xl font-bold text-slate-900 mb-2">Module Locked</h2>
-          <p className="text-sm text-slate-500 max-w-sm mb-6">
-            You must complete{" "}
-            <span className="font-semibold text-slate-700">
-              Module {previousModule!.order} — {previousModule!.title}
-            </span>{" "}
-            before accessing this module.
-          </p>
-          <Link
-            href={`/modules/${previousModule!.slug}`}
-            className="flex items-center gap-2 rounded-xl bg-teal-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 transition-colors"
-          >
-            Go to Module {previousModule!.order} <ChevronRight className="h-4 w-4" />
-          </Link>
+          {isLockedByDate ? (
+            <p className="text-sm text-slate-500 max-w-sm mb-6">
+              This module will be available on{" "}
+              <span className="font-semibold text-slate-700">
+                {availableAt.toLocaleDateString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+              . Please check back then.
+            </p>
+          ) : (
+            <p className="text-sm text-slate-500 max-w-sm mb-6">
+              You must complete{" "}
+              <span className="font-semibold text-slate-700">
+                Module {previousModule!.order} — {previousModule!.title}
+              </span>{" "}
+              before accessing this module.
+            </p>
+          )}
+          {isLockedByDate ? (
+            <Link
+              href="/modules"
+              className="flex items-center gap-2 rounded-xl bg-teal-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 transition-colors"
+            >
+              Back to Modules <ChevronRight className="h-4 w-4" />
+            </Link>
+          ) : (
+            <Link
+              href={`/modules/${previousModule!.slug}`}
+              className="flex items-center gap-2 rounded-xl bg-teal-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 transition-colors"
+            >
+              Go to Module {previousModule!.order} <ChevronRight className="h-4 w-4" />
+            </Link>
+          )}
         </div>
       )}
 
